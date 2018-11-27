@@ -28,16 +28,18 @@ ajv._opts.defaultMeta = metaSchema.id;
 const bae = require('better-ajv-errors');
 
 class JSONSchemaError extends Error {
-  constructor(message) {
+  constructor(message, errors) {
     super(message);
     this.name = 'JSONSchemaError';
+    this.errors = errors
   }
 }
 
 class CLIError extends Error {
-  constructor(message) {
+  constructor(message, errors) {
     super(message);
     this.name = 'CLIError';
+    this.errors = errors
   }
 }
 
@@ -98,9 +100,9 @@ function validateSchema(schema, openapi, options) {
     if (errors && errors.length) {
         if (options.prettify) {
             const errorStr = bae(schema, openapi, errors);
-            throw (new CLIError(errorStr));
+            throw (new CLIError(errorStr, errors));
         }
-        throw (new JSONSchemaError('Schema invalid: ' + util.inspect(errors)));
+        throw new JSONSchemaError('Schema invalid: ' + util.inspect(errors), errors);
     }
     options.schema = schema;
     return !(errors && errors.length);
@@ -1330,9 +1332,9 @@ function schemaValidate(openapi, options) {
     if (errors && errors.length) {
         if (options.prettify) {
             const errorStr = bae(options.schema, openapi, errors, { indent: 2 });
-            throw (new CLIError(errorStr));
+            throw (new CLIError(errorStr, errors));
         }
-        throw (new JSONSchemaError('Failed OpenAPI3 schema validation: ' + JSON.stringify(errors, null, 2)));
+        throw new JSONSchemaError('Failed OpenAPI3 schema validation: ' + JSON.stringify(errors, null, 2), errors);
     }
 }
 
