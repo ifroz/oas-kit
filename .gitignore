@@ -4,5 +4,6 @@ in/
 dist/
 test/s2o-test/_*/
 .vscode
+.idea
 utils/
 packages/oas-validator/schemas/henry*
